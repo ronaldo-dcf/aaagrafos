@@ -1,0 +1,431 @@
+#include<iostream>
+
+using namespace std;
+class Vertice;
+class Arista{
+int dato;
+Arista* sig;
+Vertice* dest;
+
+friend class grafico;
+public:
+
+Arista(Vertice* _dest, int _precio)
+{
+    int precio;
+	dest = _dest;
+	precio = _precio;
+	sig = NULL;
+}
+};
+class Arista;
+class Vertice
+{
+	std::string nombre;
+	Vertice* sig;
+	Arista* ari;
+
+	friend class Grafo;
+public:
+	Vertice(std::string nombre);
+};
+
+Vertice::Vertice(std::string _nombre)
+{
+	nombre = _nombre;
+	sig = NULL;
+	ari = NULL;
+}
+class Grafo
+{
+	Vertice* primero;
+	int tamano;
+
+public:
+	Grafo()
+{
+	primero = NULL;
+	tamano = 0;
+}
+bool EstaVacio()
+{
+	return tamano == 0;
+}
+int ObtenerTamano()
+{
+	return tamano;
+}
+
+	Vertice* ObtenerVertice(string nombre); // Retornar el vertice que tenga el nombre especificado
+	void InsertaVertice(string nombre); // Inserta un vertice al grafo
+	void InsertaArista(string ori, string dest, int precio); // Inserta arista entre los dos vertices especificados con el precio especificado
+	void MostrarListaAdyacencia(); // Mostrar todos los vertices con sus aristas y precios
+	void RecorridoAnchura(string origen); // Recorre el grafo con el algoritmo de anchura
+	void RecorridoProfundidad(string origen); // Recorre el grafo con el algoritmo de profundidad
+};
+Vertice* Grafo::ObtenerVertice(string nombre)
+{
+	Vertice* i = primero;
+
+	while (i != NULL)
+	{
+		if (i->nombre == nombre)
+			return i;
+
+		i = i->sig;
+	}
+
+	return NULL;
+}
+void Grafo::InsertaVertice(string nombre)
+{
+	if (ObtenerVertice(nombre) == NULL)
+	{
+		Vertice* nuevo = new Vertice(nombre);
+
+		if (EstaVacio())
+			primero = nuevo;
+		else
+		{
+			Vertice* i = primero;
+
+			while (i->sig != NULL)
+				i = i->sig;
+
+			i->sig = nuevo;
+		}
+
+		tamano++;
+	}
+	else
+		cout << "Ese vertice ya existe en el grafo" << endl;
+}
+void Grafo::InsertaArista(string ori, string dest, int precio)
+{
+	Vertice* vori = ObtenerVertice(ori);
+	Vertice* vdest = ObtenerVertice(dest);
+
+	if (vori == NULL)
+		cout << "El vertice origen no existe" << endl;
+
+	if (vdest == NULL)
+		cout << "El vertice destino no existe" << endl;
+
+	if (vori != NULL && vdest != NULL)
+	{
+		Arista* nueva = new Arista(vdest, precio);
+
+		if (vori->ari == NULL)
+			vori->ari = nueva;
+		else
+		{
+			Arista* j = vori->ari;
+
+
+
+
+		}
+	}
+}
+
+void Grafo::RecorridoAnchura(string origen)
+{
+	Vertice* vOrigen = ObtenerVertice(origen);
+
+	if (vOrigen != NULL)
+	{
+		cout << "Origen: " << origen << endl;
+		cout << "En anchura: ";
+		queue<Vertice*> cola;
+		list<Vertice*> lista;
+		cola.push(vOrigen);
+
+		while (!cola.empty())
+		{
+			Vertice* vActual = cola.front();
+			cola.pop();
+
+			list<Vertice*>::iterator iter = find(lista.begin(), lista.end(), vActual);
+
+			if (iter == lista.end())
+			{
+				cout << vActual->nombre << ", ";
+				lista.push_back(vActual);
+			}
+
+			Arista* i = vActual->ari;
+
+			while (i != NULL)
+			{
+				Vertice* vDestino = i->dest;
+				iter = find(lista.begin(), lista.end(), vDestino);
+
+				if (iter == lista.end())
+					cola.push(vDestino);
+
+				i = i->sig;
+			}
+		}
+	}
+	else
+		cout << "El vertice especificado no existe" << endl;
+}
+void Grafo::RecorridoProfundidad(string origen)
+{
+	Vertice* vOrigen = ObtenerVertice(origen);
+
+	if (vOrigen != NULL)
+	{
+		cout << "Origen: " << origen << endl;
+		cout << "En profundidad: ";
+		stack<Vertice*> pila;
+		list<Vertice*> lista;
+		pila.push(vOrigen);
+
+		while (!pila.empty())
+		{
+			Vertice* vActual = pila.top();
+			pila.pop();
+
+			list<Vertice*>::iterator iter = find(lista.begin(), lista.end(), vActual);
+
+			if (iter == lista.end())
+			{
+				cout << vActual->nombre << ", ";
+				lista.push_back(vActual);
+			}
+
+			Arista* i = vActual->ari;
+
+			while (i != NULL)
+			{
+				Vertice* vDestino = i->dest;
+				iter = find(lista.begin(), lista.end(), vDestino);
+
+				if (iter == lista.end())
+					pila.push(vDestino);
+
+				i = i->sig;
+			}
+		}
+	}
+	else
+		cout << "El vertice especificado no existe" << endl;
+}
+
+class grafico{
+private:
+    int Matri[4][4];
+    int NumVer, Vertices[4];
+public:
+    grafico(){
+        int dato, dato1;
+for (dato= 0; dato<4; dato++)
+for (dato1= 0; dato<4; dato1++)
+if (dato != dato1)
+Matri[dato][dato1]= 1;
+else
+Matri[dato][dato1]= 0;
+NumVer= 0;
+    };
+void Lee();
+void Imprime();
+/* Métodos que permiten el cálculo del árbol abarcador de costo
+➥mínimo. */
+void profundidad(int NivelProf)
+{
+int Indice, EstadoFinal= 0, VisitaAux[4], Resp= 1;
+int Visitado, NoVisitado, ListaAux;
+int VertiX;
+for (Indice= 0; Indice < NumVer; Indice++)
+VisitaAux[Indice]= 0;
+NoVisitado=(Vertices[0]);
+VisitaAux[0]= 1;
+Indice= 0;
+while (!NoVisitado && !EstadoFinal)
+{
+VertiX= NoVisitado;
+if (!Indice < NivelProf)
+{
+
+while (!ListaAux && !EstadoFinal)
+{
+VertiX= ListaAux;
+
+}
+Indice++;
+}
+}
+;
+}
+void GraficoAnchura(string origen, string destino)
+{
+Vertice* vOrigen = ObtenerVertice(origen);
+
+	if (vOrigen != NULL)
+	{
+		cout << "Origen: " << origen << endl;
+		cout << "En anchura: ";
+		queue<Vertice*> cola;
+		list<Vertice*> lista;
+		cola.push(vOrigen);
+
+		while (!cola.empty())
+		{
+			Vertice* vActual = cola.front();
+			cola.pop();
+
+			list<Vertice*>::iterator iter = find(lista.begin(), lista.end(), vActual);
+
+			if (iter == lista.end())
+			{
+				cout << vActual->nombre << ", ";
+				lista.push_back(vActual);
+			}
+
+			Arista* i = vActual->ari;
+
+			while (i != NULL)
+			{
+				Vertice* vDestino = i->dest;
+				iter = find(lista.begin(), lista.end(), vDestino);
+
+				if (iter == lista.end())
+					cola.push(vDestino);
+
+				i = i->sig;
+			}
+		}
+	}
+	else
+		cout << "El vertice especificado no existe" << endl;
+}
+void RecorridoProfundidad(string origen)
+{
+	Vertice* vOrigen = ObtenerVertice(origen);
+
+	if (vOrigen != NULL)
+	{
+		cout << "Origen: " << origen << endl;
+		cout << "En profundidad: ";
+		stack<Vertice*> pila;
+		list<Vertice*> lista;
+		pila.push(vOrigen);
+
+		while (!pila.empty())
+		{
+			Vertice* vActual = pila.top();
+			pila.pop();
+
+			list<Vertice*>::iterator iter = find(lista.begin(), lista.end(), vActual);
+
+			if (iter == lista.end())
+			{
+				cout << vActual->nombre << ", ";
+				lista.push_back(vActual);
+			}
+
+			Arista* i = vActual->ari;
+
+			while (i != NULL)
+			{
+				Vertice* vDestino = i->dest;
+				iter = find(lista.begin(), lista.end(), vDestino);
+
+				if (iter == lista.end())
+					pila.push(vDestino);
+
+				i = i->sig;
+			}
+		}
+	}
+	else
+		cout << "El vertice especificado no existe" << endl;
+}
+
+};
+
+
+
+
+
+int main(){
+
+cout<<"HOLA MUNDO";
+return 0;
+}
+/*
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Estructura de datos para almacenar un borde de graph
+class Edge {
+    int src, dest;
+};
+
+// Una clase para representar un objeto graph
+class Graph
+{
+public:
+    // un vector de vectores para representar una lista de adyacencia
+    vector<vector<int>> adjList;
+
+    // Constructor de graph
+    Graph(vector<Edge> const &edges, int n)
+    {
+        // cambiar el tamaño del vector para contener `n` elementos de tipo `vector<int>`
+        adjList.resize(n);
+
+        // agrega bordes al grafo dirigido
+        for (auto &edge: edges)
+        {
+            // insertar al final
+            adjList[edge.src].push_back(edge.dest);
+
+            // elimine el comentario del siguiente código para el graph no dirigido
+            // adjList[edge.dest].push_back(edge.src);
+        }
+    }
+};
+
+// Función para imprimir la representación de la lista de adyacencia de un graph
+void printGraph(Graph const &graph, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        // imprime el número de vértice actual
+        cout << i << " ——> ";
+
+        // imprime todos los vértices vecinos de un vértice `i`
+        for (int v: graph.adjList[i]) {
+            cout << v << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Implementación de graph usando STL
+int main()
+{
+    // vector de los bordes del graph según el diagrama anterior.
+    // Tenga en cuenta que el vector de inicialización en el siguiente formato
+    // funciona bien en C++11, C++14, C++17 pero fallará en C++98.
+    vector<Edge> edges =
+    {
+        {0, 1}, {1, 2}, {2, 0}, {2, 1}, {3, 2}, {4, 5}, {5, 4}
+    };
+
+    // número total de nodos en el graph (etiquetados de 0 a 5)
+    int n = 6;
+
+    // construir grafo
+    Graph graph(edges, n);
+
+    // imprime la representación de la lista de adyacencia de un graph
+    printGraph(graph, n);
+
+    return 0;
+}
+
+*/
